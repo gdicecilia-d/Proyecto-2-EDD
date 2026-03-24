@@ -36,6 +36,20 @@ public class MainVentana extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         btnCSV = new javax.swing.JButton();
         panelIzquierdo1 = new javax.swing.JPanel();
+        estado = new javax.swing.JLabel();
+        tiempo = new javax.swing.JLabel();
+        btnEliminarCola = new javax.swing.JButton();
+        btnLiberarImpresora = new javax.swing.JButton();
+        encola = new javax.swing.JLabel();
+        PanelDocumentos = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        btnEliminarDocumento = new javax.swing.JButton();
+        btnEnviarImpresion = new javax.swing.JButton();
+        btnNuevoDocumento1 = new javax.swing.JButton();
+        PanelColaLista = new javax.swing.JPanel();
+        btnVerLista = new javax.swing.JButton();
+        btnVerLista1 = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Sistema de Cola de Impresión");
@@ -51,7 +65,7 @@ public class MainVentana extends javax.swing.JFrame {
         panelSuperior.add(jLabel1);
 
         panelIzquierdo.setBackground(new java.awt.Color(243, 234, 247));
-        panelIzquierdo.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Usuarios Del Sistema", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.TOP, new java.awt.Font("Arial", 1, 14), new java.awt.Color(90, 78, 109))); // NOI18N
+        panelIzquierdo.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Usuarios Del Sistema", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.TOP, new java.awt.Font("Arial", 1, 16), new java.awt.Color(90, 78, 109))); // NOI18N
         panelIzquierdo.setForeground(new java.awt.Color(217, 203, 234));
         panelIzquierdo.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -80,19 +94,94 @@ public class MainVentana extends javax.swing.JFrame {
         panelIzquierdo.add(btnCSV, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 300, 98, 32));
 
         panelIzquierdo1.setBackground(new java.awt.Color(255, 241, 255));
-        panelIzquierdo1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Control de Impresion", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.TOP, new java.awt.Font("Arial", 1, 14), new java.awt.Color(107, 78, 109))); // NOI18N
+        panelIzquierdo1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Control de Impresion", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.TOP, new java.awt.Font("Arial", 1, 16), new java.awt.Color(107, 78, 109))); // NOI18N
         panelIzquierdo1.setForeground(new java.awt.Color(217, 203, 234));
         panelIzquierdo1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        estado.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        estado.setForeground(new java.awt.Color(102, 102, 102));
+        estado.setText("Estado: Listo");
+        panelIzquierdo1.add(estado, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 310, -1, -1));
+
+        tiempo.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        tiempo.setForeground(new java.awt.Color(102, 102, 102));
+        tiempo.setText("Tiempo: 00:00:00 ");
+        panelIzquierdo1.add(tiempo, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 50, -1, -1));
+
+        btnEliminarCola.setBackground(new java.awt.Color(255, 153, 204));
+        btnEliminarCola.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
+        btnEliminarCola.setForeground(new java.awt.Color(255, 255, 255));
+        btnEliminarCola.setText("Eliminar de Cola");
+        panelIzquierdo1.add(btnEliminarCola, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 200, 310, 50));
+
+        btnLiberarImpresora.setBackground(new java.awt.Color(183, 156, 237));
+        btnLiberarImpresora.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
+        btnLiberarImpresora.setForeground(new java.awt.Color(255, 255, 255));
+        btnLiberarImpresora.setText("Liberar Impresora");
+        panelIzquierdo1.add(btnLiberarImpresora, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 130, 310, 50));
+
+        encola.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        encola.setForeground(new java.awt.Color(102, 102, 102));
+        encola.setText(" En cola: 0 documentos  ");
+        panelIzquierdo1.add(encola, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 80, -1, 20));
+
+        PanelDocumentos.setBackground(new java.awt.Color(243, 234, 247));
+        PanelDocumentos.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Documentos del Usuario Seleccionado", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.TOP, new java.awt.Font("Arial", 1, 16), new java.awt.Color(90, 78, 109))); // NOI18N
+        PanelDocumentos.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        PanelDocumentos.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 40, 730, 190));
+
+        btnEliminarDocumento.setBackground(new java.awt.Color(255, 153, 204));
+        btnEliminarDocumento.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        btnEliminarDocumento.setForeground(new java.awt.Color(255, 255, 255));
+        btnEliminarDocumento.setText("Eliminar Documento");
+        PanelDocumentos.add(btnEliminarDocumento, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 240, 170, 40));
+
+        btnEnviarImpresion.setBackground(new java.awt.Color(0, 221, 221));
+        btnEnviarImpresion.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        btnEnviarImpresion.setForeground(new java.awt.Color(255, 255, 255));
+        btnEnviarImpresion.setText("Enviar Impresión");
+        PanelDocumentos.add(btnEnviarImpresion, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 240, 160, 40));
+
+        btnNuevoDocumento1.setBackground(new java.awt.Color(175, 189, 255));
+        btnNuevoDocumento1.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        btnNuevoDocumento1.setForeground(new java.awt.Color(255, 255, 255));
+        btnNuevoDocumento1.setText("Nuevo Documento");
+        PanelDocumentos.add(btnNuevoDocumento1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 240, 160, 40));
+
+        PanelColaLista.setBackground(new java.awt.Color(255, 241, 255));
+        PanelColaLista.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Vista de la Cola de Impresión", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.TOP, new java.awt.Font("Arial", 1, 16), new java.awt.Color(107, 78, 109))); // NOI18N
+        PanelColaLista.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        btnVerLista.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        btnVerLista.setForeground(new java.awt.Color(255, 153, 204));
+        btnVerLista.setText("Ver como Árbol");
+        PanelColaLista.add(btnVerLista, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 40, 160, 30));
+
+        btnVerLista1.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        btnVerLista1.setForeground(new java.awt.Color(175, 189, 255));
+        btnVerLista1.setText("Ver como Lista");
+        PanelColaLista.add(btnVerLista1, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 40, 160, 30));
+
+        jScrollPane3.setBackground(new java.awt.Color(255, 255, 255));
+        PanelColaLista.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 90, 710, 220));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(panelSuperior, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(panelIzquierdo, javax.swing.GroupLayout.PREFERRED_SIZE, 387, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(panelIzquierdo1, javax.swing.GroupLayout.PREFERRED_SIZE, 390, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(PanelColaLista, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(PanelDocumentos, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(panelIzquierdo, javax.swing.GroupLayout.PREFERRED_SIZE, 387, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(panelIzquierdo1, javax.swing.GroupLayout.PREFERRED_SIZE, 390, javax.swing.GroupLayout.PREFERRED_SIZE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -100,9 +189,13 @@ public class MainVentana extends javax.swing.JFrame {
                 .addComponent(panelSuperior, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(panelIzquierdo, javax.swing.GroupLayout.PREFERRED_SIZE, 354, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(panelIzquierdo1, javax.swing.GroupLayout.PREFERRED_SIZE, 354, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(524, Short.MAX_VALUE))
+                    .addComponent(panelIzquierdo1, javax.swing.GroupLayout.PREFERRED_SIZE, 354, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(panelIzquierdo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 354, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(PanelDocumentos, javax.swing.GroupLayout.PREFERRED_SIZE, 294, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(PanelColaLista, javax.swing.GroupLayout.PREFERRED_SIZE, 328, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -142,13 +235,27 @@ public class MainVentana extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel PanelColaLista;
+    private javax.swing.JPanel PanelDocumentos;
     private javax.swing.JButton btnCSV;
+    private javax.swing.JButton btnEliminarCola;
+    private javax.swing.JButton btnEliminarDocumento;
+    private javax.swing.JButton btnEnviarImpresion;
+    private javax.swing.JButton btnLiberarImpresora;
     private javax.swing.JButton btnNuevo;
+    private javax.swing.JButton btnNuevoDocumento1;
+    private javax.swing.JButton btnVerLista;
+    private javax.swing.JButton btnVerLista1;
+    private javax.swing.JLabel encola;
+    private javax.swing.JLabel estado;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JPanel panelIzquierdo;
     private javax.swing.JPanel panelIzquierdo1;
     private javax.swing.JPanel panelSuperior;
+    private javax.swing.JLabel tiempo;
     // End of variables declaration//GEN-END:variables
 }
