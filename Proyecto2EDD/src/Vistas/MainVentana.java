@@ -1,4 +1,10 @@
 package Vistas;
+import Modelo.TipoUsuario;
+import Modelo.Usuario;
+import Modelo.Documento;
+import Modelo.RegistroImpresion;
+import Servicios.SistemaImpresion;
+import Utilidades.ManejadorArchivos;
 
 /**
  *
@@ -10,11 +16,70 @@ public class MainVentana extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MainVentana.class.getName());
 
+    private Servicios.SistemaImpresion sistema;
+    
+    private void actualizarTablas() {
+        // Actualizar tabla de usuarios
+        Vistas.modelos.ModeloTablaUsuarios modeloUsuarios = new Vistas.modelos.ModeloTablaUsuarios();
+        modeloUsuarios.setUsuarios(sistema.listarUsuarios());
+        tablaUsuarios.setModel(modeloUsuarios);
+        
+        // Actualizar tabla de cola
+        Vistas.modelos.ModeloTablaCola modeloCola = new Vistas.modelos.ModeloTablaCola();
+        modeloCola.setRegistros(sistema.obtenerColaImpresion());
+        tablaCola.setModel(modeloCola);
+        
+        // Actualizar tiempo y documentos en cola
+        tiempo.setText("Tiempo: " + sistema.getTiempoFormateado());
+        encola.setText("En cola: " + sistema.getDocumentosEnCola() + " documentos");
+        
+        // Actualizar documentos del usuario seleccionado
+        int fila = tablaUsuarios.getSelectedRow();
+        if (fila >= 0) {
+            Usuario usuario = sistema.listarUsuarios()[fila];
+            Vistas.modelos.ModeloTablaDocumentos modeloDocumentos = new Vistas.modelos.ModeloTablaDocumentos();
+            modeloDocumentos.setDocumentos(sistema.listarDocumentosUsuario(usuario.getNombreUsuario(), false), usuario);
+            tablaDocumentos.setModel(modeloDocumentos);
+        } else {
+            Vistas.modelos.ModeloTablaDocumentos modeloDocumentos = new Vistas.modelos.ModeloTablaDocumentos();
+            modeloDocumentos.setDocumentos(new Documento[0], null);
+            tablaDocumentos.setModel(modeloDocumentos);
+        }
+    }
     /**
      * Creates new form MainVentana
      */
     public MainVentana() {
         initComponents();
+        // Tamaño fijo 
+        setSize(1155, 750);
+        
+        // Centrar la ventana en la pantalla
+        setLocationRelativeTo(null);
+        
+        // No permitir redimensionar 
+        setResizable(false);
+        
+        sistema = new Servicios.SistemaImpresion();
+        
+        // Listener para cuando se selecciona un usuario
+        tablaUsuarios.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                int fila = tablaUsuarios.getSelectedRow();
+                if (fila >= 0) {
+                    Usuario usuario = sistema.listarUsuarios()[fila];
+                    Vistas.modelos.ModeloTablaDocumentos modeloDocumentos = new Vistas.modelos.ModeloTablaDocumentos();
+                    modeloDocumentos.setDocumentos(sistema.listarDocumentosUsuario(usuario.getNombreUsuario(), false), usuario);
+                    tablaDocumentos.setModel(modeloDocumentos);
+                } else {
+                    Vistas.modelos.ModeloTablaDocumentos modeloDocumentos = new Vistas.modelos.ModeloTablaDocumentos();
+                    modeloDocumentos.setDocumentos(new Documento[0], null);
+                    tablaDocumentos.setModel(modeloDocumentos);
+                }
+            }
+        });
+        // Actualizar tablas al inicio
+        actualizarTablas();
     }
 
     /**
@@ -30,8 +95,9 @@ public class MainVentana extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         panelIzquierdo = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
+        tablaUsuarios = new javax.swing.JTable();
         btnNuevo = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        btnEliminar = new javax.swing.JButton();
         btnCSV = new javax.swing.JButton();
         panelIzquierdo1 = new javax.swing.JPanel();
         estado = new javax.swing.JLabel();
@@ -41,13 +107,15 @@ public class MainVentana extends javax.swing.JFrame {
         encola = new javax.swing.JLabel();
         PanelDocumentos = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
+        tablaDocumentos = new javax.swing.JTable();
         btnEliminarDocumento = new javax.swing.JButton();
         btnEnviarImpresion = new javax.swing.JButton();
         btnNuevoDocumento1 = new javax.swing.JButton();
         PanelColaLista = new javax.swing.JPanel();
-        btnVerLista = new javax.swing.JButton();
+        btnVerArbol = new javax.swing.JButton();
         btnVerLista1 = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
+        tablaCola = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Sistema de Cola de Impresión");
@@ -67,26 +135,49 @@ public class MainVentana extends javax.swing.JFrame {
         panelIzquierdo.setForeground(new java.awt.Color(217, 203, 234));
         panelIzquierdo.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jScrollPane1.setBackground(new java.awt.Color(255, 255, 255));
+        jScrollPane1.setBackground(new java.awt.Color(249, 249, 249));
+        jScrollPane1.setToolTipText("");
+
+        tablaUsuarios.setBackground(new java.awt.Color(249, 249, 249));
+        tablaUsuarios.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tablaUsuarios.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jScrollPane1.setViewportView(tablaUsuarios);
+
         panelIzquierdo.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(21, 37, 340, 249));
 
+        btnNuevo.setBackground(new java.awt.Color(249, 249, 249));
         btnNuevo.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         btnNuevo.setForeground(new java.awt.Color(175, 189, 255));
         btnNuevo.setText("Nuevo");
+        btnNuevo.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnNuevo.addActionListener(this::btnNuevoActionPerformed);
         panelIzquierdo.add(btnNuevo, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 300, 98, 32));
 
-        jButton1.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
-        jButton1.setForeground(new java.awt.Color(204, 153, 255));
-        jButton1.setText("Eliminar");
-        jButton1.setMaximumSize(new java.awt.Dimension(75, 24));
-        jButton1.setMinimumSize(new java.awt.Dimension(75, 24));
-        jButton1.addActionListener(this::jButton1ActionPerformed);
-        panelIzquierdo.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 300, 98, 32));
+        btnEliminar.setBackground(new java.awt.Color(249, 249, 249));
+        btnEliminar.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        btnEliminar.setForeground(new java.awt.Color(204, 153, 255));
+        btnEliminar.setText("Eliminar");
+        btnEliminar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnEliminar.setMaximumSize(new java.awt.Dimension(75, 24));
+        btnEliminar.setMinimumSize(new java.awt.Dimension(75, 24));
+        btnEliminar.addActionListener(this::btnEliminarActionPerformed);
+        panelIzquierdo.add(btnEliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 300, 98, 32));
 
+        btnCSV.setBackground(new java.awt.Color(249, 249, 249));
         btnCSV.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         btnCSV.setForeground(new java.awt.Color(255, 153, 204));
         btnCSV.setText("CSV");
+        btnCSV.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnCSV.setMaximumSize(new java.awt.Dimension(75, 24));
         btnCSV.setMinimumSize(new java.awt.Dimension(75, 24));
         btnCSV.addActionListener(this::btnCSVActionPerformed);
@@ -111,6 +202,7 @@ public class MainVentana extends javax.swing.JFrame {
         btnEliminarCola.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
         btnEliminarCola.setForeground(new java.awt.Color(255, 255, 255));
         btnEliminarCola.setText("Eliminar de Cola");
+        btnEliminarCola.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnEliminarCola.addActionListener(this::btnEliminarColaActionPerformed);
         panelIzquierdo1.add(btnEliminarCola, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 200, 310, 50));
 
@@ -118,6 +210,7 @@ public class MainVentana extends javax.swing.JFrame {
         btnLiberarImpresora.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
         btnLiberarImpresora.setForeground(new java.awt.Color(255, 255, 255));
         btnLiberarImpresora.setText("Liberar Impresora");
+        btnLiberarImpresora.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnLiberarImpresora.addActionListener(this::btnLiberarImpresoraActionPerformed);
         panelIzquierdo1.add(btnLiberarImpresora, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 130, 310, 50));
 
@@ -129,12 +222,31 @@ public class MainVentana extends javax.swing.JFrame {
         PanelDocumentos.setBackground(new java.awt.Color(243, 234, 247));
         PanelDocumentos.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Documentos del Usuario Seleccionado", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.TOP, new java.awt.Font("Arial", 1, 16), new java.awt.Color(90, 78, 109))); // NOI18N
         PanelDocumentos.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jScrollPane2.setBackground(new java.awt.Color(249, 249, 249));
+
+        tablaDocumentos.setBackground(new java.awt.Color(249, 249, 249));
+        tablaDocumentos.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tablaDocumentos.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jScrollPane2.setViewportView(tablaDocumentos);
+
         PanelDocumentos.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 40, 730, 190));
 
         btnEliminarDocumento.setBackground(new java.awt.Color(255, 153, 204));
         btnEliminarDocumento.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         btnEliminarDocumento.setForeground(new java.awt.Color(255, 255, 255));
         btnEliminarDocumento.setText("Eliminar Documento");
+        btnEliminarDocumento.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnEliminarDocumento.addActionListener(this::btnEliminarDocumentoActionPerformed);
         PanelDocumentos.add(btnEliminarDocumento, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 240, 170, 40));
 
@@ -142,6 +254,7 @@ public class MainVentana extends javax.swing.JFrame {
         btnEnviarImpresion.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         btnEnviarImpresion.setForeground(new java.awt.Color(255, 255, 255));
         btnEnviarImpresion.setText("Enviar Impresión");
+        btnEnviarImpresion.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnEnviarImpresion.addActionListener(this::btnEnviarImpresionActionPerformed);
         PanelDocumentos.add(btnEnviarImpresion, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 240, 160, 40));
 
@@ -149,6 +262,7 @@ public class MainVentana extends javax.swing.JFrame {
         btnNuevoDocumento1.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         btnNuevoDocumento1.setForeground(new java.awt.Color(255, 255, 255));
         btnNuevoDocumento1.setText("Nuevo Documento");
+        btnNuevoDocumento1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnNuevoDocumento1.addActionListener(this::btnNuevoDocumento1ActionPerformed);
         PanelDocumentos.add(btnNuevoDocumento1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 240, 160, 40));
 
@@ -156,20 +270,40 @@ public class MainVentana extends javax.swing.JFrame {
         PanelColaLista.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Vista de la Cola de Impresión", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.TOP, new java.awt.Font("Arial", 1, 16), new java.awt.Color(107, 78, 109))); // NOI18N
         PanelColaLista.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        btnVerLista.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
-        btnVerLista.setForeground(new java.awt.Color(255, 153, 204));
-        btnVerLista.setText("Ver como Árbol");
-        btnVerLista.addActionListener(this::btnVerListaActionPerformed);
-        PanelColaLista.add(btnVerLista, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 40, 160, 30));
+        btnVerArbol.setBackground(new java.awt.Color(249, 249, 249));
+        btnVerArbol.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        btnVerArbol.setForeground(new java.awt.Color(255, 153, 204));
+        btnVerArbol.setText("Ver como Árbol");
+        btnVerArbol.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnVerArbol.addActionListener(this::btnVerArbolActionPerformed);
+        PanelColaLista.add(btnVerArbol, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 40, 160, 30));
 
+        btnVerLista1.setBackground(new java.awt.Color(249, 249, 249));
         btnVerLista1.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         btnVerLista1.setForeground(new java.awt.Color(175, 189, 255));
         btnVerLista1.setText("Ver como Lista");
+        btnVerLista1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnVerLista1.addActionListener(this::btnVerLista1ActionPerformed);
-        PanelColaLista.add(btnVerLista1, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 40, 160, 30));
+        PanelColaLista.add(btnVerLista1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, 160, 30));
 
-        jScrollPane3.setBackground(new java.awt.Color(255, 255, 255));
-        PanelColaLista.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 90, 710, 220));
+        jScrollPane3.setBackground(new java.awt.Color(249, 249, 249));
+
+        tablaCola.setBackground(new java.awt.Color(249, 249, 249));
+        tablaCola.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tablaCola.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jScrollPane3.setViewportView(tablaCola);
+
+        PanelColaLista.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 110, 330, 500));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -177,75 +311,269 @@ public class MainVentana extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(panelSuperior, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(PanelColaLista, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(PanelColaLista, javax.swing.GroupLayout.PREFERRED_SIZE, 352, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(PanelDocumentos, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(panelIzquierdo, javax.swing.GroupLayout.PREFERRED_SIZE, 387, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(panelIzquierdo, javax.swing.GroupLayout.DEFAULT_SIZE, 387, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(panelIzquierdo1, javax.swing.GroupLayout.PREFERRED_SIZE, 390, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addComponent(panelIzquierdo1, javax.swing.GroupLayout.DEFAULT_SIZE, 390, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(panelSuperior, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(panelIzquierdo1, javax.swing.GroupLayout.PREFERRED_SIZE, 354, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(panelIzquierdo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 354, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(PanelDocumentos, javax.swing.GroupLayout.PREFERRED_SIZE, 294, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(PanelColaLista, javax.swing.GroupLayout.PREFERRED_SIZE, 328, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(panelIzquierdo1, javax.swing.GroupLayout.PREFERRED_SIZE, 354, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(panelIzquierdo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 354, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(PanelDocumentos, javax.swing.GroupLayout.PREFERRED_SIZE, 294, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(PanelColaLista, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
+        int fila = tablaUsuarios.getSelectedRow();
+        if (fila < 0) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Seleccione un usuario para eliminar",
+                "Aviso",
+                javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        Usuario usuario = sistema.listarUsuarios()[fila];
+        
+        int confirmar = javax.swing.JOptionPane.showConfirmDialog(this, 
+            "¿Está seguro de eliminar el usuario " + usuario.getNombreUsuario() + "?",
+            "Confirmar",
+            javax.swing.JOptionPane.YES_NO_OPTION);
+        
+        if (confirmar == javax.swing.JOptionPane.YES_OPTION) {
+            sistema.eliminarUsuario(usuario.getNombreUsuario());
+            estado.setText("Estado: Usuario eliminado");
+            actualizarTablas();
+        }
+    }//GEN-LAST:event_btnEliminarActionPerformed
 
     private void btnCSVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCSVActionPerformed
-        // TODO add your handling code here:
+        String ruta = Utilidades.ManejadorArchivos.seleccionarArchivoCSV(null);
+        if (ruta != null) {
+            try {
+                sistema.cargarUsuariosDesdeCSV(ruta);
+                estado.setText("Estado: Usuarios cargados desde CSV");
+                actualizarTablas();
+                javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Usuarios cargados correctamente", 
+                    "Éxito", 
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception ex) {
+                javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Error al cargar archivo: " + ex.getMessage(), 
+                    "Error", 
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }//GEN-LAST:event_btnCSVActionPerformed
 
     private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoActionPerformed
-        // TODO add your handling code here:
+        String nombre = javax.swing.JOptionPane.showInputDialog(this, "Nombre del usuario:");
+        if (nombre != null && !nombre.trim().isEmpty()) {
+            String[] opciones = {"Alta", "Media", "Baja"};
+            int seleccion = javax.swing.JOptionPane.showOptionDialog(this, 
+                "Seleccione el tipo de prioridad:",
+                "Tipo de Usuario",
+                javax.swing.JOptionPane.DEFAULT_OPTION,
+                javax.swing.JOptionPane.QUESTION_MESSAGE,
+                null,
+                opciones,
+                opciones[1]);
+            
+            Modelo.TipoUsuario tipo;
+            if (seleccion == 0) {
+                tipo = Modelo.TipoUsuario.prioridad_alta;
+            } else if (seleccion == 2) {
+                tipo = Modelo.TipoUsuario.prioridad_baja;
+            } else {
+                tipo = Modelo.TipoUsuario.prioridad_media;
+            }
+            
+            sistema.agregarUsuario(new Modelo.Usuario(nombre.trim(), tipo));
+            estado.setText("Estado: Usuario agregado");
+            actualizarTablas();
+        }
     }//GEN-LAST:event_btnNuevoActionPerformed
 
     private void btnLiberarImpresoraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLiberarImpresoraActionPerformed
-        // TODO add your handling code here:
+        RegistroImpresion impreso = sistema.liberarImpresora();
+        if (impreso != null) {
+            estado.setText("Estado: Impreso: " + impreso.getDocumento().getNombre());
+        } else {
+            estado.setText("Estado: Cola vacía");
+        }
+        actualizarTablas();
     }//GEN-LAST:event_btnLiberarImpresoraActionPerformed
 
     private void btnEliminarColaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarColaActionPerformed
-        // TODO add your handling code here:
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            "Funcionalidad en desarrollo.\n" +
+            "Seleccione usuario y documento para eliminar de la cola",
+            "En desarrollo",
+            javax.swing.JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_btnEliminarColaActionPerformed
 
     private void btnNuevoDocumento1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoDocumento1ActionPerformed
-        // TODO add your handling code here:
+        int fila = tablaUsuarios.getSelectedRow();
+        if (fila < 0) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Primero seleccione un usuario",
+                "Aviso",
+                javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        Usuario usuario = sistema.listarUsuarios()[fila];
+        
+        String nombre = javax.swing.JOptionPane.showInputDialog(this, "Nombre del documento:");
+        if (nombre != null && !nombre.trim().isEmpty()) {
+            String tamanioStr = javax.swing.JOptionPane.showInputDialog(this, "Número de páginas:");
+            if (tamanioStr != null) {
+                try {
+                    int tamanio = Integer.parseInt(tamanioStr);
+                    String[] tipos = {"PDF", "Texto", "Imagen", "PowerPoint"};
+                    String tipo = (String) javax.swing.JOptionPane.showInputDialog(this,
+                        "Seleccione el tipo:",
+                        "Tipo de Documento",
+                        javax.swing.JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        tipos,
+                        tipos[0]);
+                    
+                    if (tipo != null) {
+                        sistema.crearDocumento(usuario.getNombreUsuario(), nombre.trim(), tamanio, tipo);
+                        estado.setText("Estado: Documento creado: " + nombre);
+                        actualizarTablas();
+                    }
+                } catch (NumberFormatException ex) {
+                    javax.swing.JOptionPane.showMessageDialog(this, 
+                        "Ingrese un número válido para el tamaño",
+                        "Error",
+                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
     }//GEN-LAST:event_btnNuevoDocumento1ActionPerformed
 
     private void btnEnviarImpresionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnviarImpresionActionPerformed
-        // TODO add your handling code here:
+        int filaUsuario = tablaUsuarios.getSelectedRow();
+        if (filaUsuario < 0) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Primero seleccione un usuario",
+                "Aviso",
+                javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        int filaDoc = tablaDocumentos.getSelectedRow();
+        if (filaDoc < 0) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Seleccione un documento para enviar",
+                "Aviso",
+                javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        Usuario usuario = sistema.listarUsuarios()[filaUsuario];
+        
+        Documento[] docs = sistema.listarDocumentosUsuario(usuario.getNombreUsuario(), false);
+        if (filaDoc >= docs.length) return;
+        Documento documento = docs[filaDoc];
+        
+        int opcion = javax.swing.JOptionPane.showConfirmDialog(this,
+            "¿Enviar como documento prioritario?",
+            "Prioridad",
+            javax.swing.JOptionPane.YES_NO_OPTION);
+        
+        boolean esPrioritario = (opcion == javax.swing.JOptionPane.YES_OPTION);
+        
+        boolean exito = sistema.enviarAImpresion(usuario.getNombreUsuario(), 
+            documento.getNombre(), esPrioritario);
+        
+        if (exito) {
+            estado.setText("Estado: Documento enviado a cola: " + documento.getNombre());
+            actualizarTablas();
+        } else {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Error al enviar el documento",
+                "Error",
+                javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnEnviarImpresionActionPerformed
 
     private void btnEliminarDocumentoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarDocumentoActionPerformed
-        // TODO add your handling code here:
+       int filaUsuario = tablaUsuarios.getSelectedRow();
+        if (filaUsuario < 0) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Primero seleccione un usuario",
+                "Aviso",
+                javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        int filaDoc = tablaDocumentos.getSelectedRow();
+        if (filaDoc < 0) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Seleccione un documento para eliminar",
+                "Aviso",
+                javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        Usuario usuario = sistema.listarUsuarios()[filaUsuario];
+        
+        Documento[] docs = sistema.listarDocumentosUsuario(usuario.getNombreUsuario(), false);
+        if (filaDoc >= docs.length) return;
+        Documento documento = docs[filaDoc];
+        
+        if (usuario.documentoEstaEnCola(documento.getNombre())) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "No se puede eliminar el documento porque ya está en la cola de impresión",
+                "Aviso",
+                javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        int confirmar = javax.swing.JOptionPane.showConfirmDialog(this,
+            "¿Eliminar documento " + documento.getNombre() + "?",
+            "Confirmar",
+            javax.swing.JOptionPane.YES_NO_OPTION);
+        
+        if (confirmar == javax.swing.JOptionPane.YES_OPTION) {
+            usuario.eliminarDocumento(documento.getNombre());
+            estado.setText("Estado: Documento eliminado: " + documento.getNombre());
+            actualizarTablas();
+        }
     }//GEN-LAST:event_btnEliminarDocumentoActionPerformed
 
     private void btnVerLista1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerLista1ActionPerformed
-        // TODO add your handling code here:
+        estado.setText("Estado: Vista de lista activa");
     }//GEN-LAST:event_btnVerLista1ActionPerformed
 
-    private void btnVerListaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerListaActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnVerListaActionPerformed
+    private void btnVerArbolActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerArbolActionPerformed
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            "Vista de árbol en desarrollo.\n" +
+            "Próximamente se mostrará el montículo como árbol",
+            "En desarrollo",
+            javax.swing.JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_btnVerArbolActionPerformed
 
     /**
      * @param args the command line arguments
@@ -276,17 +604,17 @@ public class MainVentana extends javax.swing.JFrame {
     private javax.swing.JPanel PanelColaLista;
     private javax.swing.JPanel PanelDocumentos;
     private javax.swing.JButton btnCSV;
+    private javax.swing.JButton btnEliminar;
     private javax.swing.JButton btnEliminarCola;
     private javax.swing.JButton btnEliminarDocumento;
     private javax.swing.JButton btnEnviarImpresion;
     private javax.swing.JButton btnLiberarImpresora;
     private javax.swing.JButton btnNuevo;
     private javax.swing.JButton btnNuevoDocumento1;
-    private javax.swing.JButton btnVerLista;
+    private javax.swing.JButton btnVerArbol;
     private javax.swing.JButton btnVerLista1;
     private javax.swing.JLabel encola;
     private javax.swing.JLabel estado;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
@@ -294,6 +622,9 @@ public class MainVentana extends javax.swing.JFrame {
     private javax.swing.JPanel panelIzquierdo;
     private javax.swing.JPanel panelIzquierdo1;
     private javax.swing.JPanel panelSuperior;
+    private javax.swing.JTable tablaCola;
+    private javax.swing.JTable tablaDocumentos;
+    private javax.swing.JTable tablaUsuarios;
     private javax.swing.JLabel tiempo;
     // End of variables declaration//GEN-END:variables
 }
