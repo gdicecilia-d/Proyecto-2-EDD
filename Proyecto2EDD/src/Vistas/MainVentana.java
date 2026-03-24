@@ -423,11 +423,48 @@ public class MainVentana extends javax.swing.JFrame {
     }//GEN-LAST:event_btnLiberarImpresoraActionPerformed
 
     private void btnEliminarColaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarColaActionPerformed
-        javax.swing.JOptionPane.showMessageDialog(this, 
-            "Funcionalidad en desarrollo.\n" +
-            "Seleccione usuario y documento para eliminar de la cola",
-            "En desarrollo",
-            javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        int fila = tablaCola.getSelectedRow();
+        if (fila < 0) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Seleccione un documento de la cola para eliminar",
+                "Aviso",
+                javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        // Obtener el registro seleccionado
+        Object[] registros = sistema.obtenerColaImpresion();
+        RegistroImpresion registro = (RegistroImpresion) registros[fila];
+        
+        if (registro == null) return;
+        
+        int confirmar = javax.swing.JOptionPane.showConfirmDialog(this,
+            "¿Eliminar el documento '" + registro.getDocumento().getNombre() + 
+            "' de " + registro.getNombreUsuario() + "?\n" +
+            "El documento se eliminará de la cola sin imprimirse.",
+            "Confirmar eliminación",
+            javax.swing.JOptionPane.YES_NO_OPTION);
+        
+        if (confirmar == javax.swing.JOptionPane.YES_OPTION) {
+            // Eliminar por ID usando el método del BinaryHeap
+            boolean eliminado = sistema.getColaImpresion().eliminarPorId(registro.getId()) != null;
+            
+            if (eliminado) {
+                // Actualizar el estado del usuario
+                Usuario usuario = sistema.buscarUsuario(registro.getNombreUsuario());
+                if (usuario != null) {
+                    usuario.marcarDocumentoImpreso(registro.getDocumento().getNombre());
+                }
+                
+                estado.setText("Estado: Documento eliminado de la cola: " + registro.getDocumento().getNombre());
+                actualizarTablas();
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Error al eliminar el documento",
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }//GEN-LAST:event_btnEliminarColaActionPerformed
 
     private void btnNuevoDocumento1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoDocumento1ActionPerformed
@@ -568,11 +605,34 @@ public class MainVentana extends javax.swing.JFrame {
     }//GEN-LAST:event_btnVerLista1ActionPerformed
 
     private void btnVerArbolActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerArbolActionPerformed
-        javax.swing.JOptionPane.showMessageDialog(this, 
-            "Vista de árbol en desarrollo.\n" +
-            "Próximamente se mostrará el montículo como árbol",
-            "En desarrollo",
-            javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        // Crear una ventana para mostrar el árbol
+        javax.swing.JDialog dialog = new javax.swing.JDialog(this, "Vista de Árbol - Cola de Impresión", false);
+        dialog.setSize(800, 600);
+        dialog.setLocationRelativeTo(this);
+        
+        // Crear el panel que dibuja el árbol
+        Vistas.componentes.PanelArbolMonticulo panelArbol = new Vistas.componentes.PanelArbolMonticulo();
+        panelArbol.setMonticulo(sistema.getColaImpresion());
+        
+        // Temporizador para actualizar automáticamente cada 1 segundo
+        javax.swing.Timer timer = new javax.swing.Timer(1000, e -> {
+            panelArbol.setMonticulo(sistema.getColaImpresion());
+        });
+        timer.start();
+        
+        // Detener el temporizador cuando se cierra la ventana
+        dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent e) {
+                timer.stop();
+            }
+        });
+        
+        // Agregar al diálogo
+        dialog.setLayout(new java.awt.BorderLayout());
+        dialog.add(panelArbol, java.awt.BorderLayout.CENTER);
+        
+        dialog.setVisible(true);
     }//GEN-LAST:event_btnVerArbolActionPerformed
 
     /**
