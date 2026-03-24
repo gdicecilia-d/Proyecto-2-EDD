@@ -1,12 +1,10 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package Vistas;
 
 /**
  *
- * @author grazi
+ * @author grazia
+ * @author elohym
+ * @author andres
  */
 public class MainVentana extends javax.swing.JFrame {
     
@@ -75,6 +73,7 @@ public class MainVentana extends javax.swing.JFrame {
         btnNuevo.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         btnNuevo.setForeground(new java.awt.Color(175, 189, 255));
         btnNuevo.setText("Nuevo");
+        btnNuevo.addActionListener(this::btnNuevoActionPerformed);
         panelIzquierdo.add(btnNuevo, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 300, 98, 32));
 
         jButton1.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
@@ -112,12 +111,14 @@ public class MainVentana extends javax.swing.JFrame {
         btnEliminarCola.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
         btnEliminarCola.setForeground(new java.awt.Color(255, 255, 255));
         btnEliminarCola.setText("Eliminar de Cola");
+        btnEliminarCola.addActionListener(this::btnEliminarColaActionPerformed);
         panelIzquierdo1.add(btnEliminarCola, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 200, 310, 50));
 
         btnLiberarImpresora.setBackground(new java.awt.Color(183, 156, 237));
         btnLiberarImpresora.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
         btnLiberarImpresora.setForeground(new java.awt.Color(255, 255, 255));
         btnLiberarImpresora.setText("Liberar Impresora");
+        btnLiberarImpresora.addActionListener(this::btnLiberarImpresoraActionPerformed);
         panelIzquierdo1.add(btnLiberarImpresora, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 130, 310, 50));
 
         encola.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
@@ -134,18 +135,21 @@ public class MainVentana extends javax.swing.JFrame {
         btnEliminarDocumento.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         btnEliminarDocumento.setForeground(new java.awt.Color(255, 255, 255));
         btnEliminarDocumento.setText("Eliminar Documento");
+        btnEliminarDocumento.addActionListener(this::btnEliminarDocumentoActionPerformed);
         PanelDocumentos.add(btnEliminarDocumento, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 240, 170, 40));
 
         btnEnviarImpresion.setBackground(new java.awt.Color(0, 221, 221));
         btnEnviarImpresion.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         btnEnviarImpresion.setForeground(new java.awt.Color(255, 255, 255));
         btnEnviarImpresion.setText("Enviar Impresión");
+        btnEnviarImpresion.addActionListener(this::btnEnviarImpresionActionPerformed);
         PanelDocumentos.add(btnEnviarImpresion, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 240, 160, 40));
 
         btnNuevoDocumento1.setBackground(new java.awt.Color(175, 189, 255));
         btnNuevoDocumento1.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         btnNuevoDocumento1.setForeground(new java.awt.Color(255, 255, 255));
         btnNuevoDocumento1.setText("Nuevo Documento");
+        btnNuevoDocumento1.addActionListener(this::btnNuevoDocumento1ActionPerformed);
         PanelDocumentos.add(btnNuevoDocumento1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 240, 160, 40));
 
         PanelColaLista.setBackground(new java.awt.Color(255, 241, 255));
@@ -155,11 +159,13 @@ public class MainVentana extends javax.swing.JFrame {
         btnVerLista.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         btnVerLista.setForeground(new java.awt.Color(255, 153, 204));
         btnVerLista.setText("Ver como Árbol");
+        btnVerLista.addActionListener(this::btnVerListaActionPerformed);
         PanelColaLista.add(btnVerLista, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 40, 160, 30));
 
         btnVerLista1.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         btnVerLista1.setForeground(new java.awt.Color(175, 189, 255));
         btnVerLista1.setText("Ver como Lista");
+        btnVerLista1.addActionListener(this::btnVerLista1ActionPerformed);
         PanelColaLista.add(btnVerLista1, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 40, 160, 30));
 
         jScrollPane3.setBackground(new java.awt.Color(255, 255, 255));
@@ -208,6 +214,38 @@ public class MainVentana extends javax.swing.JFrame {
     private void btnCSVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCSVActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_btnCSVActionPerformed
+
+    private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnNuevoActionPerformed
+
+    private void btnLiberarImpresoraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLiberarImpresoraActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnLiberarImpresoraActionPerformed
+
+    private void btnEliminarColaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarColaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnEliminarColaActionPerformed
+
+    private void btnNuevoDocumento1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoDocumento1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnNuevoDocumento1ActionPerformed
+
+    private void btnEnviarImpresionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnviarImpresionActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnEnviarImpresionActionPerformed
+
+    private void btnEliminarDocumentoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarDocumentoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnEliminarDocumentoActionPerformed
+
+    private void btnVerLista1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerLista1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnVerLista1ActionPerformed
+
+    private void btnVerListaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerListaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnVerListaActionPerformed
 
     /**
      * @param args the command line arguments
