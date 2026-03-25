@@ -185,4 +185,33 @@ public class BinaryHeap<T extends Comparable<T> & Identificable> {
         heap[index] = elemento;
         idToIndex.put(elemento.getId(), index);
     }
+
+    /**
+     * Reubica un elemento por ID (cambia su prioridad al mínimo y lo elimina)
+     * Este método se usa para eliminar un documento específico de la cola
+     * según el mecanismo requerido por el proyecto: cambiar la etiqueta de tiempo
+     * al valor más bajo, reubicarlo en la raíz y luego aplicar eliminarMin
+     * 
+     * @param id ID del elemento a eliminar
+     * @return true si se eliminó, false si no se encontró
+     */
+    @SuppressWarnings("unchecked")
+    public boolean reubicarPorId(int id) {
+        Integer index = idToIndex.get(id);
+        if (index == null) return false;
+        
+        // Cambiar prioridad al valor más bajo posible
+        T elemento = (T) heap[index];
+        
+        // Se asume que T tiene un método setEtiquetaTiempo (RegistroImpresion lo tiene)
+        // Esto permite modificar la prioridad del elemento
+        ((Modelo.RegistroImpresion) elemento).setEtiquetaTiempo(Integer.MIN_VALUE);
+        
+        // Reubicar hacia arriba hasta la raíz
+        percolateUp(index);
+        
+        // Eliminar la raíz (que ahora es este elemento)
+        T eliminado = eliminarMin();
+        return eliminado != null && eliminado.getId() == id;
+    }
 }

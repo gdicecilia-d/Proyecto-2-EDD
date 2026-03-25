@@ -423,40 +423,64 @@ public class MainVentana extends javax.swing.JFrame {
     }//GEN-LAST:event_btnLiberarImpresoraActionPerformed
 
     private void btnEliminarColaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarColaActionPerformed
-        int fila = tablaCola.getSelectedRow();
-        if (fila < 0) {
+        // Pedir al usuario que seleccione el usuario
+        String[] nombresUsuarios = sistema.listarNombresUsuarios();
+        if (nombresUsuarios.length == 0) {
             javax.swing.JOptionPane.showMessageDialog(this, 
-                "Seleccione un documento de la cola para eliminar",
+                "No hay usuarios en el sistema",
                 "Aviso",
                 javax.swing.JOptionPane.WARNING_MESSAGE);
             return;
         }
         
-        // Obtener el registro seleccionado
-        Object[] registros = sistema.obtenerColaImpresion();
-        RegistroImpresion registro = (RegistroImpresion) registros[fila];
+        String usuarioSeleccionado = (String) javax.swing.JOptionPane.showInputDialog(this,
+            "Seleccione el usuario dueño del documento:",
+            "Eliminar de cola",
+            javax.swing.JOptionPane.QUESTION_MESSAGE,
+            null,
+            nombresUsuarios,
+            nombresUsuarios[0]);
         
-        if (registro == null) return;
+        if (usuarioSeleccionado == null) return;
+        
+        // Obtener los documentos de ese usuario que están en cola
+        Usuario usuario = sistema.buscarUsuario(usuarioSeleccionado);
+        if (usuario == null) return;
+        
+        Documento[] docsEnCola = usuario.getDocumentosEnCola();
+        if (docsEnCola.length == 0) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "El usuario no tiene documentos en cola",
+                "Aviso",
+                javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        String[] nombresDocs = new String[docsEnCola.length];
+        for (int i = 0; i < docsEnCola.length; i++) {
+            nombresDocs[i] = docsEnCola[i].getNombre();
+        }
+        
+        String docSeleccionado = (String) javax.swing.JOptionPane.showInputDialog(this,
+            "Seleccione el documento a eliminar:",
+            "Eliminar de cola",
+            javax.swing.JOptionPane.QUESTION_MESSAGE,
+            null,
+            nombresDocs,
+            nombresDocs[0]);
+        
+        if (docSeleccionado == null) return;
         
         int confirmar = javax.swing.JOptionPane.showConfirmDialog(this,
-            "¿Eliminar el documento '" + registro.getDocumento().getNombre() + 
-            "' de " + registro.getNombreUsuario() + "?\n" +
+            "¿Eliminar el documento '" + docSeleccionado + "' de " + usuarioSeleccionado + "?\n" +
             "El documento se eliminará de la cola sin imprimirse.",
             "Confirmar eliminación",
             javax.swing.JOptionPane.YES_NO_OPTION);
         
         if (confirmar == javax.swing.JOptionPane.YES_OPTION) {
-            // Eliminar por ID usando el método del BinaryHeap
-            boolean eliminado = sistema.getColaImpresion().eliminarPorId(registro.getId()) != null;
-            
-            if (eliminado) {
-                // Actualizar el estado del usuario
-                Usuario usuario = sistema.buscarUsuario(registro.getNombreUsuario());
-                if (usuario != null) {
-                    usuario.marcarDocumentoImpreso(registro.getDocumento().getNombre());
-                }
-                
-                estado.setText("Estado: Documento eliminado de la cola: " + registro.getDocumento().getNombre());
+            boolean exito = sistema.eliminarDocumentoDeCola(usuarioSeleccionado, docSeleccionado);
+            if (exito) {
+                estado.setText("Estado: Documento eliminado de la cola: " + docSeleccionado);
                 actualizarTablas();
             } else {
                 javax.swing.JOptionPane.showMessageDialog(this, 
@@ -485,6 +509,13 @@ public class MainVentana extends javax.swing.JFrame {
             if (tamanioStr != null) {
                 try {
                     int tamanio = Integer.parseInt(tamanioStr);
+                    if (tamanio <= 0) {
+                        javax.swing.JOptionPane.showMessageDialog(this, 
+                            "El número de páginas debe ser mayor a 0",
+                            "Error",
+                            javax.swing.JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                     String[] tipos = {"PDF", "Texto", "Imagen", "PowerPoint"};
                     String tipo = (String) javax.swing.JOptionPane.showInputDialog(this,
                         "Seleccione el tipo:",

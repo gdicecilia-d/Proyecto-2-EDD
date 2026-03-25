@@ -23,9 +23,6 @@ public class RegistroImpresion implements Comparable<RegistroImpresion>, Identif
     // Etiqueta de tiempo 
     private int etiquetaTiempo;
     
-    // Nombre del usuario dueño del documento 
-    private String nombreUsuario;
-    
     // Identificador único de este registro 
     private int id;
     
@@ -34,14 +31,13 @@ public class RegistroImpresion implements Comparable<RegistroImpresion>, Identif
      * 
      * @param documento el documento a imprimir
      * @param etiquetaTiempo valor de prioridad (menor = más prioridad)
-     * @param nombreUsuario nombre del usuario que envió el documento
      */
-    public RegistroImpresion(Documento documento, int etiquetaTiempo, String nombreUsuario) {
+    public RegistroImpresion(Documento documento, int etiquetaTiempo) {
         this.documento = documento;
         this.etiquetaTiempo = etiquetaTiempo;
-        this.nombreUsuario = nombreUsuario;
         this.id = ++contadorId;
     }
+    
     
     /**
      * Obtiene el documento
@@ -59,15 +55,6 @@ public class RegistroImpresion implements Comparable<RegistroImpresion>, Identif
      */
     public int getEtiquetaTiempo() {
         return etiquetaTiempo;
-    }
-    
-    /**
-     * Obtiene el nombre del usuario dueño
-     * 
-     * @return nombre del usuario
-     */
-    public String getNombreUsuario() {
-        return nombreUsuario;
     }
     
     /**
@@ -124,7 +111,6 @@ public class RegistroImpresion implements Comparable<RegistroImpresion>, Identif
      */
     @Override
     public String toString() {
-        return documento.getNombre() + " (prioridad: " + etiquetaTiempo + ") - " + nombreUsuario;
+        return documento.getNombre() + " (prioridad: " + etiquetaTiempo + ")";
     }
-    
 }

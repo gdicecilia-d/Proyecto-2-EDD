@@ -1,6 +1,7 @@
 package Servicios;
 
 import Estructuras.BinaryHeap;
+import Estructuras.HashTable;
 import Modelo.Documento;
 import Modelo.RegistroImpresion;
 import Modelo.TipoUsuario;
@@ -19,6 +20,12 @@ public class SistemaImpresion {
     // Montículo binario que funciona como cola de prioridad 
     private BinaryHeap<RegistroImpresion> colaImpresion;
     
+    // Tabla hash para mapear (usuario|documento) 
+    private HashTable<String, RegistroImpresion> tablaDocumentosEnCola;
+    
+    // Tabla hash para mapear ID del registro 
+    private HashTable<Integer, String> tablaIdAClave;
+    
     // Arreglo de usuarios del sistema 
     private Usuario[] usuarios;
     
@@ -36,9 +43,22 @@ public class SistemaImpresion {
      */
     public SistemaImpresion() {
         this.colaImpresion = new BinaryHeap<>(10);
+        this.tablaDocumentosEnCola = new HashTable<>();
+        this.tablaIdAClave = new HashTable<>();
         this.usuarios = new Usuario[CAPACIDAD_USUARIOS];
         this.totalUsuarios = 0;
         this.reloj = new RelojSimulacion();
+    }
+    
+    /**
+     * Genera una clave única para la tabla hash
+     * 
+     * @param nombreUsuario nombre del usuario
+     * @param nombreDocumento nombre del documento
+     * @return clave única
+     */
+    private String generarClave(String nombreUsuario, String nombreDocumento) {
+        return nombreUsuario + "|" + nombreDocumento;
     }
     
     /**
@@ -175,16 +195,20 @@ public class SistemaImpresion {
         // Calcular etiqueta de tiempo
         int etiquetaTiempo = tiempoBase;
         if (esPrioritario) {
-            // Restar la prioridad del usuario para que tenga menor valor (más prioridad)
             int prioridad = usuario.getTipo().getValorPrioridad();
             etiquetaTiempo = tiempoBase - prioridad;
         }
         
-        // Crear registro de impresión
-        RegistroImpresion registro = new RegistroImpresion(documento, etiquetaTiempo, nombreUsuario);
+        // Crear registro 
+        RegistroImpresion registro = new RegistroImpresion(documento, etiquetaTiempo);
         
         // Insertar en la cola
         colaImpresion.insertar(registro);
+        
+        // Guardar en ambas tablas
+        String clave = generarClave(nombreUsuario, nombreDocumento);
+        tablaDocumentosEnCola.put(clave, registro);
+        tablaIdAClave.put(registro.getId(), clave);
         
         // Marcar documento como en cola
         usuario.marcarDocumentoEnCola(nombreDocumento);
@@ -195,7 +219,7 @@ public class SistemaImpresion {
     /**
      * Libera la impresora: imprime el documento con mayor prioridad
      * 
-     * @return el documento impreso, o null si la cola está vacía
+     * @return el documento impreso o null si la cola está vacía
      */
     public RegistroImpresion liberarImpresora() {
         if (colaImpresion.estaVacio()) {
@@ -205,10 +229,24 @@ public class SistemaImpresion {
         RegistroImpresion impreso = colaImpresion.eliminarMin();
         
         if (impreso != null) {
-            // Marcar documento como impreso
-            Usuario usuario = buscarUsuario(impreso.getNombreUsuario());
-            if (usuario != null) {
-                usuario.marcarDocumentoImpreso(impreso.getDocumento().getNombre());
+            // Obtener la clave en O(1) usando el ID
+            String clave = tablaIdAClave.get(impreso.getId());
+            
+            if (clave != null) {
+                // Eliminar de ambas tablas
+                tablaDocumentosEnCola.remove(clave);
+                tablaIdAClave.remove(impreso.getId());
+                
+                // Extraer nombreUsuario y nombreDocumento de la clave
+                String[] partes = clave.split("\\|");
+                if (partes.length >= 2) {
+                    String nombreUsuario = partes[0];
+                    String nombreDocumento = partes[1];
+                    Usuario usuario = buscarUsuario(nombreUsuario);
+                    if (usuario != null) {
+                        usuario.marcarDocumentoImpreso(nombreDocumento);
+                    }
+                }
             }
         }
         
@@ -216,18 +254,39 @@ public class SistemaImpresion {
     }
     
     /**
-     * Elimina un documento de la cola de impresión
+     * Elimina un documento de la cola de impresión usando la tabla hash
      * 
      * @param nombreUsuario nombre del usuario dueño
      * @param nombreDocumento nombre del documento
      * @return true si se eliminó, false si no se encontró
      */
     public boolean eliminarDocumentoDeCola(String nombreUsuario, String nombreDocumento) {
-        // Este método requiere buscar el registro en la cola.
-        // Como el montículo no permite búsqueda directa,
-        // necesitamos una forma de encontrar el registro.
-        // Por ahora retornamos false.
-        // Más adelante podemos implementarlo con la tabla hash.
+        String clave = generarClave(nombreUsuario, nombreDocumento);
+        RegistroImpresion registro = tablaDocumentosEnCola.get(clave);
+        
+        if (registro == null) {
+            return false;
+        }
+        
+        // Cambiar prioridad al valor más bajo posible 
+        registro.setEtiquetaTiempo(Integer.MIN_VALUE);
+        
+        // Reubicar en el montículo usando el método reubicarPorId
+        boolean eliminado = colaImpresion.reubicarPorId(registro.getId());
+        
+        if (eliminado) {
+            // Eliminar de ambas tablas
+            tablaDocumentosEnCola.remove(clave);
+            tablaIdAClave.remove(registro.getId());
+            
+            // Actualizar el estado del usuario
+            Usuario usuario = buscarUsuario(nombreUsuario);
+            if (usuario != null) {
+                usuario.marcarDocumentoImpreso(nombreDocumento);
+            }
+            return true;
+        }
+        
         return false;
     }
     
@@ -240,6 +299,19 @@ public class SistemaImpresion {
         Usuario[] resultado = new Usuario[totalUsuarios];
         System.arraycopy(usuarios, 0, resultado, 0, totalUsuarios);
         return resultado;
+    }
+    
+    /**
+     * Obtiene los nombres de todos los usuarios
+     * 
+     * @return arreglo con los nombres de usuarios
+     */
+    public String[] listarNombresUsuarios() {
+        String[] nombres = new String[totalUsuarios];
+        for (int i = 0; i < totalUsuarios; i++) {
+            nombres[i] = usuarios[i].getNombreUsuario();
+        }
+        return nombres;
     }
     
     /**
@@ -309,7 +381,7 @@ public class SistemaImpresion {
     }
     
     /**
-     * Obtiene la cantidad de documentos en cola.
+     * Obtiene la cantidad de documentos en cola
      * 
      * @return número de documentos en cola
      */
@@ -318,10 +390,12 @@ public class SistemaImpresion {
     }
     
     /**
-     * Reinicia todo el sistema.
+     * Reinicia todo el sistema
      */
     public void reiniciar() {
         colaImpresion = new BinaryHeap<>(10);
+        tablaDocumentosEnCola = new HashTable<>();
+        tablaIdAClave = new HashTable<>();
         usuarios = new Usuario[CAPACIDAD_USUARIOS];
         totalUsuarios = 0;
         reloj.reiniciar();
