@@ -62,7 +62,7 @@ public class BinaryHeap<T extends Comparable<T> & Identificable> {
             idToIndex.put(((T) heap[0]).getId(), 0);
             percolateDown(0);
         }
-        heap[size] = null; // ayuda al GC
+        heap[size] = null; 
         return min;
     }
 
@@ -203,7 +203,7 @@ public class BinaryHeap<T extends Comparable<T> & Identificable> {
         // Cambiar prioridad al valor más bajo posible
         T elemento = (T) heap[index];
         
-        // Se asume que T tiene un método setEtiquetaTiempo (RegistroImpresion lo tiene)
+        // Se asume que T tiene un método setEtiquetaTiempo 
         // Esto permite modificar la prioridad del elemento
         ((Modelo.RegistroImpresion) elemento).setEtiquetaTiempo(Integer.MIN_VALUE);
         
