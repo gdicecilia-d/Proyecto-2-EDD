@@ -14,7 +14,7 @@ Grazia Di Cecilia: C.I. 31.867.163
 Repositorio: https://github.com/gdicecilia-d/Proyecto-2-EDD.git
 
 
-## Diagrma de Clases: 
+## Diagrama de Clases: 
 
 https://lucid.app/lucidchart/a3afcf18-275a-49e0-bec4-092ce1b08660/edit?viewport_loc=-5680%2C-3386%2C4988%2C2475%2C0_0&invitationId=inv_2e422dc5-d604-4cc1-92c7-f9a59a670427
 
