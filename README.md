@@ -6,11 +6,11 @@ tiempo constante O(1) sin que la cola conozca al propietario.
 
 Integrantes del grupo:
 
-Elohym Casais: C.I. 32.491.310
+**Elohym Casais:** C.I. 32.491.310
 
-Andrés Colmenares: C.I. 31.703.897
+**Andrés Colmenares:** C.I. 31.703.897
 
-Grazia Di Cecilia: C.I. 31.867.163
+**Grazia Di Cecilia:** C.I. 31.867.163
 
 Repositorio: https://github.com/gdicecilia-d/Proyecto-2-EDD.git
 
