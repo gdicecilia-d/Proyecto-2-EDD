@@ -5,6 +5,7 @@ de llegada y rangos de usuario, utilizando un Montículo Binario (Min-Heap) para
 tiempo constante O(1) sin que la cola conozca al propietario.
 
 Integrantes del grupo:
+
 Elohym Casais: C.I. 32.491.310
 
 Andrés Colmenares: C.I. 31.703.897
